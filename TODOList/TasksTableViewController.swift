@@ -3,7 +3,7 @@
 //  TODOList
 //
 //  Created by Dmitry Karpinsky on 05.05.2021.
-//
+//  added main view controller, detail view controller, segue to dvc and unwind segue, custom cell for table view, custom placeholder text view, editting style for main view controller 
 
 import UIKit
 
