@@ -7,8 +7,8 @@
 
 import Foundation
 
-struct Task {
+struct TaskStruct {
     var title : String
-    var descriptionn : String?
+    var description : String?
     var isDone : Bool
 }

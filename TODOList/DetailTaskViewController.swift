@@ -13,7 +13,7 @@ class DetailTaskViewController: UIViewController {
         print("deinit dvc")
     }
 
-    var currentTask : Task = Task(title: "", descriptionn: nil, isDone: false)
+    var currentTask : TaskStruct = TaskStruct(title: "", description: nil, isDone: false)
     var index : Int!
     
     @IBOutlet weak var titleTask: UITextField!
@@ -31,14 +31,14 @@ class DetailTaskViewController: UIViewController {
 
         title =  currentTask.title == "" ? "Новая задача" : "Изменить задачу"
         titleTask.text = currentTask.title
-        descriptionTask.text = currentTask.descriptionn
+        descriptionTask.text = currentTask.description
         isDoneButton.setOn(currentTask.isDone, animated: true)
         saveButton.isEnabled = false
         titleTask.addTarget(self, action: #selector(textFieldsChanged), for: .editingChanged)
         saveButton.isEnabled = false
         
-        if currentTask.descriptionn != nil && !currentTask.descriptionn!.isEmpty  {
-            descriptionTask.text = currentTask.descriptionn
+        if currentTask.description != nil && !currentTask.description!.isEmpty  {
+            descriptionTask.text = currentTask.description
         } else {
             descriptionTask.text = "Введите описание"
             descriptionTask.textColor = UIColor.lightGray
@@ -54,7 +54,7 @@ class DetailTaskViewController: UIViewController {
     @IBAction func savePressed(_ sender: Any) {
         print(sender.self)
         currentTask.title = titleTask.text!
-        currentTask.descriptionn = descriptionTask.text!
+        currentTask.description = descriptionTask.text!
         print(descriptionTask.text!)// null pointer exception
     }
     

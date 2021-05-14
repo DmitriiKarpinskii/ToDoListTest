@@ -18,6 +18,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let tvc = nc.topViewController as! TasksTableViewController
         let context =  (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer.viewContext
         tvc.context = context
+        print(context)
         
         guard let _ = (scene as? UIWindowScene) else { return }
     }
