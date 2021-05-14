@@ -9,6 +9,6 @@ import Foundation
 
 struct Task {
     var title : String
-    var description : String?
+    var descriptionn : String?
     var isDone : Bool
 }

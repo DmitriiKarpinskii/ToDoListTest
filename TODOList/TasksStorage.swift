@@ -12,10 +12,12 @@ struct TasksStorage {
     var tasks : [Task] = {
         
         let result = [
-            Task(title: "Купить продукты", description: "мясо,хлеб,яйцомясо,хлеб,яйцомясо,хлеб,яйцомясо,хлеб,яйцо", isDone: false),
-            Task(title: "Позвонить Ире---", description: "в 13:00", isDone: false),
-            Task(title: "Встреча в Пятницу", description: "взять блокнот и ручку", isDone: false),
-            Task(title: "Купить зарядку", description: "номер заказа Z-D1399", isDone: true)
+            Task(title: "Купить продукты", descriptionn: "мясо,хлеб,яйцомясо,хлеб", isDone: false),
+            Task(title: "Позвонить Ире", descriptionn: "в 13:00", isDone: false),
+            Task(title: "Встреча в Пятницу", descriptionn: "взять блокнот и ручку", isDone: false),
+            Task(title: "Отвезти ба в аэропорт", descriptionn: nil, isDone: true),
+            Task(title: "Купить билет", descriptionn: "кино в восркресенье", isDone: false),
+            Task(title: "На английский", descriptionn: nil, isDone: false)
         ]
         
         return result

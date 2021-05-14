@@ -6,16 +6,34 @@
 //  added main view controller, detail view controller, segue to dvc and unwind segue, custom cell for table view, custom placeholder text view, editting style for main view controller 
 
 import UIKit
+import CoreData
 
 class TasksTableViewController: UITableViewController {
     
     var myTasks = TasksStorage().getTasks()
+    var context : NSManagedObjectContext!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         self.navigationItem.leftBarButtonItem = self.editButtonItem
+        
+        
+        if let barItemFont = UIFont(name: "AppleSDGothicNeo-Regular", size: 24) {
+        
+            self.navigationItem.leftBarButtonItem?.setTitleTextAttributes([
+                NSAttributedString.Key.foregroundColor:  #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1),
+                NSAttributedString.Key.font: barItemFont
+                ],
+            for: .normal)
+          
+            self.navigationItem.leftBarButtonItem?.setTitleTextAttributes([
+                NSAttributedString.Key.foregroundColor:  #colorLiteral(red: 0.4792027417, green: 0.4844020563, blue: 0.5, alpha: 1),
+                NSAttributedString.Key.font: barItemFont
+                ],
+            for: .disabled)
+        }
     }
     
     private func addTaskToMyTasks(task : Task) {
@@ -53,8 +71,10 @@ class TasksTableViewController: UITableViewController {
             cell.isDoneTaskButton.alpha = 0
             
         }
-        if let description = myTasks[indexPath.row].description {
+        if let description = myTasks[indexPath.row].descriptionn {
             cell.descriptionTask.text = description
+        } else {
+            cell.descriptionTask.text = ""
         }
         return cell
     }
@@ -82,6 +102,34 @@ class TasksTableViewController: UITableViewController {
         
     }
     
+    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+    
+        let action = UIContextualAction(style: .destructive, title: "Удалить") { (action, view, boolValue) in
+            self.myTasks.remove(at: indexPath.row)
+//            tableView.reloadData()
+            tableView.deleteRows(at: [indexPath], with: .fade)
+        }
+        let trailingSwipe = UISwipeActionsConfiguration(actions: [action])
+        
+        return trailingSwipe
+    }
+    
+    override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let isDoneTask = self.myTasks[indexPath.row].isDone
+        let action = UIContextualAction(style: .normal, title: "Done") { (action, view, complition) in
+            self.myTasks[indexPath.row].isDone.toggle()
+//            tableView.reloadData()
+            complition(true)
+            tableView.reloadData()
+        }
+        
+        action.backgroundColor = isDoneTask ? .systemGreen : .systemGray2
+                
+        action.image = UIImage(systemName: "checkmark.circle")?.withRenderingMode(.alwaysTemplate)
+        let leadingSwipe =  UISwipeActionsConfiguration(actions: [action])
+        return leadingSwipe
+    }
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showTaskSegue"  {
             let detailTaskVC = segue.destination as! DetailTaskViewController
@@ -96,9 +144,10 @@ class TasksTableViewController: UITableViewController {
         
         if let vc = segue.source as? DetailTaskViewController {
             let titleNewTask = vc.titleTask.text!
-            let descriptionNewTask = vc.descriptionTask.text!
+            let descriptionNewTask = vc.descriptionTask.text! != "Введите описание" ? vc.descriptionTask.text! : ""
+            
             let isDoneNewTask = vc.isDoneButton.isOn
-            let newTask = Task(title: titleNewTask, description: descriptionNewTask, isDone: isDoneNewTask)
+            let newTask = Task(title: titleNewTask, descriptionn: descriptionNewTask, isDone: isDoneNewTask)
             
             if vc.title == "Новая задача" {
                 addTaskToMyTasks(task: newTask)

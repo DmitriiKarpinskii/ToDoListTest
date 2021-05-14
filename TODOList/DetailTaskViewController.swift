@@ -13,7 +13,7 @@ class DetailTaskViewController: UIViewController {
         print("deinit dvc")
     }
 
-    var currentTask : Task = Task(title: "", description: nil, isDone: false)
+    var currentTask : Task = Task(title: "", descriptionn: nil, isDone: false)
     var index : Int!
     
     @IBOutlet weak var titleTask: UITextField!
@@ -27,34 +27,18 @@ class DetailTaskViewController: UIViewController {
         titleTask.delegate = self
         descriptionTask.delegate = self
         
-        if let barItemFont = UIFont(name: "AppleSDGothicNeo-Bold", size: 22) {
-            
-            self.navigationItem.rightBarButtonItem?.setTitleTextAttributes([
-                NSAttributedString.Key.foregroundColor:  #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1),
-                NSAttributedString.Key.font: barItemFont
-                ],
-            for: .normal)
-          
-            self.navigationItem.rightBarButtonItem?.setTitleTextAttributes([
-                NSAttributedString.Key.foregroundColor:  #colorLiteral(red: 0.5697843442, green: 0.6008883249, blue: 0.5683646403, alpha: 1),
-                NSAttributedString.Key.font: barItemFont
-                ],
-            for: .disabled)
-        }
+        setupStyleBatItemButtons()
 
         title =  currentTask.title == "" ? "Новая задача" : "Изменить задачу"
         titleTask.text = currentTask.title
-        descriptionTask.text = currentTask.description
+        descriptionTask.text = currentTask.descriptionn
         isDoneButton.setOn(currentTask.isDone, animated: true)
-//        saveButton.isEnabled = !titleTask.text!.isEmpty
         saveButton.isEnabled = false
-        titleTask.addTarget(self, action: #selector(textFieldChanged), for: .editingChanged)
+        titleTask.addTarget(self, action: #selector(textFieldsChanged), for: .editingChanged)
+        saveButton.isEnabled = false
         
-        
-        // Do any additional setup after loading the view.
-        
-        if let description = currentTask.description {
-            descriptionTask.text = description
+        if currentTask.descriptionn != nil && !currentTask.descriptionn!.isEmpty  {
+            descriptionTask.text = currentTask.descriptionn
         } else {
             descriptionTask.text = "Введите описание"
             descriptionTask.textColor = UIColor.lightGray
@@ -64,14 +48,13 @@ class DetailTaskViewController: UIViewController {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
         self.view.endEditing(true)
+//        print("ssadsad")
     }
     
-    
     @IBAction func savePressed(_ sender: Any) {
-        
         print(sender.self)
         currentTask.title = titleTask.text!
-        currentTask.description = descriptionTask.text!
+        currentTask.descriptionn = descriptionTask.text!
         print(descriptionTask.text!)// null pointer exception
     }
     
@@ -80,6 +63,22 @@ class DetailTaskViewController: UIViewController {
         print(newValue)
         isDoneButton.setOn(newValue, animated: false)
         currentTask.isDone = isDoneButton.isOn
+        textFieldsChanged()
+    }
+    
+    private func setupStyleBatItemButtons() {
+        if let barItemFont = UIFont(name: "AppleSDGothicNeo-Bold", size: 22) {
+            self.navigationItem.rightBarButtonItem?.setTitleTextAttributes([
+                NSAttributedString.Key.foregroundColor:  #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1),
+                NSAttributedString.Key.font: barItemFont
+                ],
+            for: .normal)
+            self.navigationItem.rightBarButtonItem?.setTitleTextAttributes([
+                NSAttributedString.Key.foregroundColor:  #colorLiteral(red: 0.4792027417, green: 0.4844020563, blue: 0.5, alpha: 1),
+                NSAttributedString.Key.font: barItemFont
+                ],
+            for: .disabled)
+        }
     }
 }
 
@@ -90,7 +89,7 @@ extension DetailTaskViewController : UITextFieldDelegate {
         return true
     }
 
-    @objc private func textFieldChanged() {
+    @objc private func textFieldsChanged() {
         if titleTask.text?.isEmpty == false {
             saveButton.isEnabled = true
         } else {
@@ -116,7 +115,10 @@ extension DetailTaskViewController : UITextViewDelegate {
             textView.text = "Введите описание"
             textView.textColor = UIColor.lightGray
           }
-
+    }
+    
+    func textViewDidChange(_ textView: UITextView) {
+        textFieldsChanged()
     }
     
 }
