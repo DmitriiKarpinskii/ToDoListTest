@@ -12,10 +12,11 @@ class DetailTaskViewController: UIViewController {
     deinit {
         print("deinit dvc")
     }
-
+    
     let context = (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer.viewContext
-    var currentTask = Task()
-    var index : Int!
+    
+    var currentTask : Task?
+    var index : Int?
     
     @IBOutlet weak var titleTask: UITextField!
     @IBOutlet weak var descriptionTask: UITextView!
@@ -24,46 +25,43 @@ class DetailTaskViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-              
+        
         titleTask.delegate = self
         descriptionTask.delegate = self
         setupStyleBatItemButtons()
         
+        title  = "Новая задача"
+        isDoneButton.setOn(false, animated: true)
         
-        title = currentTask.title == "" ? "Новая задача" : "Изменить задачу"
-        titleTask.text = currentTask.title
-        descriptionTask.text = currentTask.description
-        isDoneButton.setOn(currentTask.isDone, animated: true)
-        saveButton.isEnabled = false
-        titleTask.addTarget(self, action: #selector(textFieldsChanged), for: .editingChanged)
-        saveButton.isEnabled = false
-        
-        if currentTask.descriptionTask != nil && !currentTask.description.isEmpty  {
+        if let currentTask = currentTask {
+            title = "Изменить задачу"
+            titleTask.text = currentTask.title
             descriptionTask.text = currentTask.descriptionTask
-        } else {
+            isDoneButton.setOn(currentTask.isDone, animated: true)
+        }
+        
+        if currentTask?.descriptionTask == nil || currentTask?.descriptionTask == "" {
             descriptionTask.text = "Введите описание"
             descriptionTask.textColor = UIColor.lightGray
         }
+        
+        titleTask.addTarget(self, action: #selector(textFieldsChanged), for: .editingChanged)
+        saveButton.isEnabled = false
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
         self.view.endEditing(true)
-//        print("ssadsad")
     }
     
     @IBAction func savePressed(_ sender: Any) {
-        print(sender.self)
-        currentTask.title = titleTask.text!
-        currentTask.descriptionTask = descriptionTask.text!
-        print(descriptionTask.text!)// null pointer exception
+        print("save pressed")
     }
     
     @IBAction func isDonePressed(_ sender: UISwitch) {
         let newValue = isDoneButton.isOn
         print(newValue)
         isDoneButton.setOn(newValue, animated: false)
-        currentTask.isDone = isDoneButton.isOn
         textFieldsChanged()
     }
     
@@ -72,24 +70,24 @@ class DetailTaskViewController: UIViewController {
             self.navigationItem.rightBarButtonItem?.setTitleTextAttributes([
                 NSAttributedString.Key.foregroundColor:  #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1),
                 NSAttributedString.Key.font: barItemFont
-                ],
+            ],
             for: .normal)
             self.navigationItem.rightBarButtonItem?.setTitleTextAttributes([
                 NSAttributedString.Key.foregroundColor:  #colorLiteral(red: 0.4792027417, green: 0.4844020563, blue: 0.5, alpha: 1),
                 NSAttributedString.Key.font: barItemFont
-                ],
+            ],
             for: .disabled)
         }
     }
 }
 
 extension DetailTaskViewController : UITextFieldDelegate {
-
+    
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
     }
-
+    
     @objc private func textFieldsChanged() {
         if titleTask.text?.isEmpty == false {
             saveButton.isEnabled = true
@@ -100,14 +98,13 @@ extension DetailTaskViewController : UITextFieldDelegate {
 }
 
 extension DetailTaskViewController : UITextViewDelegate {
-  
     
     func textViewDidBeginEditing(_ textView: UITextView) {
         if textView.textColor == UIColor.lightGray {
             print("call textFieldDidBeginEditing")
             textView.text = ""
             textView.textColor = UIColor.black
-            }
+        }
     }
     
     func textViewDidEndEditing(_ textView: UITextView) {
@@ -115,11 +112,10 @@ extension DetailTaskViewController : UITextViewDelegate {
         if textView.text!.isEmpty {
             textView.text = "Введите описание"
             textView.textColor = UIColor.lightGray
-          }
+        }
     }
     
     func textViewDidChange(_ textView: UITextView) {
         textFieldsChanged()
     }
-    
 }

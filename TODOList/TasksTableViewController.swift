@@ -10,21 +10,104 @@ import CoreData
 
 class TasksTableViewController: UITableViewController {
     
-//    var myTasks = [TaskStruct]()//TasksStorage().getTasks()
-    var tasks : [Task]! 
-       
+    var tasks : [Task]!
     var context : NSManagedObjectContext!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-//        tasks = getTasks()
-        getTasks()
+        
+        setBarButtonStye()
+        showCountAvailableTask()
+        tasks = getTasksFromStore()
+        
+    }
+    
+    private func showCountAvailableTask() {
+        var count = 0
+        let fetchRequest : NSFetchRequest<Task> = Task.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "title != nil")
+        do {
+            count = try context.count(for: fetchRequest)
+            print("Count of task \(count)")
+        } catch let error as NSError {
+            print(error.localizedDescription)
+        }
+    }
+    
+    private func getTasksFromStore() -> [Task] {
+        
+        var result = [Task]()
+        let fetchRequest : NSFetchRequest<Task> = Task.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "title != nil")
+        
+        do {
+            result = try context.fetch(fetchRequest)
+        } catch let error as NSError {
+            print(error.localizedDescription)
+        }
+        return result
+    }
+    
+    private func deleteTaskFormeStore(index: Int) {
+        
+        let object = tasks[index] as NSManagedObject
+        context.delete(object)
+        tasks.remove(at: index)
+        saveContex()
+        showCountAvailableTask()
+        
+    }
+    
+    private func addTaskInStore(task: TaskStruct) {
+        let taskObj = Task(context: context)
+        taskObj.title = task.title
+        taskObj.descriptionTask = task.description
+        taskObj.isDone = task.isDone
+        taskObj.date = Date()
+        
+        tasks.append(taskObj)
+        saveContex()
+        print("Добавлениа задача \(taskObj.title!)")
+        showCountAvailableTask()
 
-        self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
-        self.navigationItem.leftBarButtonItem = self.editButtonItem
+    }
+    
+    private func updateExistenTask(task: TaskStruct, withIndex index: Int) {
+        
+        let fetchTask: NSFetchRequest<Task> = Task.fetchRequest()
+        let title = tasks[index].title!
+        print("Ищем задачу \(task.title)")
+        fetchTask.predicate = NSPredicate(format: "title = %@", title as String)
+        let result = try! context.fetch(fetchTask)
+        
+        if result.count != 0 {
+            let resultTask = result.first
+            print("Найдена зачада \(resultTask?.title)")
+            resultTask?.title = task.title
+            resultTask?.descriptionTask = task.description
+            resultTask?.isDone = task.isDone
             
+            saveContex()
+            print("Изменена задача \(task.title)")
+        }
+        showCountAvailableTask()
+    }
+    
+    private func saveContex() {
+        do {
+            try context.save()
+            tableView.reloadData()
+        } catch let error as NSError {
+            print(error.localizedDescription)
+        }
+        
+    }
+    
+    private func setBarButtonStye() {
         if let barItemFont = UIFont(name: "AppleSDGothicNeo-Regular", size: 24) {
             
+            self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+            self.navigationItem.leftBarButtonItem = self.editButtonItem
             self.navigationItem.leftBarButtonItem?.setTitleTextAttributes([
                 NSAttributedString.Key.foregroundColor:  #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1),
                 NSAttributedString.Key.font: barItemFont
@@ -39,90 +122,6 @@ class TasksTableViewController: UITableViewController {
         }
     }
     
-    private func getAvailableTask() -> Int {
-        
-        var count = 0
-        let fetchRequest : NSFetchRequest<Task> = Task.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "title != nil")
-        do {
-            count = try context.count(for: fetchRequest)
-            print("count of task \(count)")
-        } catch let error as NSError {
-            print(error.localizedDescription)
-        }
-        return count
-    }
-    
-    private func getTasks() -> [Task] {
-        
-        var result = [Task]()
-        let fetchRequest : NSFetchRequest<Task> = Task.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "title != nil")
-        
-        do {
-            self.tasks = try context.fetch(fetchRequest)
-        } catch let error as NSError {
-            print(error.localizedDescription)
-        }
-        return result
-    }
-    
-    
-    private func deleteTask(index: Int) {
-        
-        
-        let object = tasks[index] as NSManagedObject
-        context.delete(object)
-        tasks.remove(at: index)
-        
-        
-        saveTask()
-        getAvailableTask()
-    }
-    
-    private func addTask(task: Task) {
-        tasks.append(task)
-        saveTask()
-        print("addtask")
-    }
-    
-    private func updateTask(task: Task, withIndex index: Int) {
-        tasks[index] = task
-        saveTask()
-    }
-    
-    private func saveTask() {
-        do {
-            try context.save()
-            tableView.reloadData()
-        } catch let error as NSError {
-            print(error.localizedDescription)
-        }
-        
-    }
-    
-    
-    
-    
-//    private func addTaskToMyTasks(taskStruct : TaskStruct) {
-//        myTasks.append(taskStruct)
-//
-//        let entity = NSEntityDescription.entity(forEntityName: "Task", in: context)
-//        let task = NSManagedObject(entity: entity!, insertInto: context) as! Task
-//
-//        task.title = taskStruct.title
-//        task.descriptionTask = taskStruct.description
-//        task.isDone = taskStruct.isDone
-//        task.date = Date()
-//
-//        do  {
-//            try context.save()
-//            print("task added to db")
-//        } catch let error as NSError {
-//            print(error.localizedDescription)
-//        }
-//
-//    }
 //
     // MARK: - Table view data source
     
@@ -135,7 +134,6 @@ class TasksTableViewController: UITableViewController {
         // #warning Incomplete implementation, return the number of rows
         return tasks.count
     }
-    
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
@@ -172,7 +170,7 @@ class TasksTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
 //            myTasks.remove(at: indexPath.row)
-            deleteTask(index: indexPath.row)
+            deleteTaskFormeStore(index: indexPath.row)
 //            tableView.deleteRows(at: [indexPath], with: .fade)
         }
     }
@@ -180,13 +178,14 @@ class TasksTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
         let movingTask = tasks.remove(at: sourceIndexPath.row)
         tasks.insert(movingTask, at: destinationIndexPath.row)
-        saveTask()
+        saveContex()
     }
     
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         
         let action = UIContextualAction(style: .destructive, title: "Удалить") { (action, view, boolValue) in
-            self.deleteTask(index: indexPath.row)
+            self.deleteTaskFormeStore(index: indexPath.row)
+            
         }
         let trailingSwipe = UISwipeActionsConfiguration(actions: [action])
         
@@ -221,23 +220,25 @@ class TasksTableViewController: UITableViewController {
     }
     
     @IBAction func unwindSegue(segue: UIStoryboardSegue) {
-        
+
         if let vc = segue.source as? DetailTaskViewController {
+            print("vc")
+            showCountAvailableTask()
+            
             let titleNewTask = vc.titleTask.text!
             let descriptionNewTask = vc.descriptionTask.text! != "Введите описание" ? vc.descriptionTask.text! : ""
             let isDoneNewTask = vc.isDoneButton.isOn
-            let newTask = Task(context: context)
-            let index = vc.index
-            newTask.title = titleNewTask
-            newTask.descriptionTask = descriptionNewTask
-            newTask.isDone = isDoneNewTask
             
+            let newTask = TaskStruct(title: titleNewTask, description: descriptionNewTask, isDone: isDoneNewTask)
             
             if vc.title == "Новая задача" {
-                addTask(task: newTask)
+                addTaskInStore(task: newTask)
+                showCountAvailableTask()
+
             } else {
-                guard let index = index else { return}
-                updateTask(task: newTask, withIndex: index)
+                guard let index = vc.index else { return}
+                updateExistenTask(task: newTask, withIndex: index)
+                showCountAvailableTask()
             }
         }
     }
