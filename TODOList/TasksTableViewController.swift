@@ -10,13 +10,16 @@ import CoreData
 
 class TasksTableViewController: UITableViewController {
     
-    var myTasks = [TaskStruct]()//TasksStorage().getTasks()
-    var tasks : [Task]!
+//    var myTasks = [TaskStruct]()//TasksStorage().getTasks()
+    var tasks : [Task]! 
+       
     var context : NSManagedObjectContext!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        tasks = getTasks()
+//        tasks = getTasks()
+        getTasks()
+
         self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         self.navigationItem.leftBarButtonItem = self.editButtonItem
             
@@ -57,7 +60,7 @@ class TasksTableViewController: UITableViewController {
         fetchRequest.predicate = NSPredicate(format: "title != nil")
         
         do {
-            result = try context.fetch(fetchRequest)
+            self.tasks = try context.fetch(fetchRequest)
         } catch let error as NSError {
             print(error.localizedDescription)
         }
@@ -65,12 +68,30 @@ class TasksTableViewController: UITableViewController {
     }
     
     
-    private func deleteTask() {
-        
-        let index = tableView.indexPathForSelectedRow
-        tasks.remove(at: index!.row)
+    private func deleteTask(index: Int) {
         
         
+        let object = tasks[index] as NSManagedObject
+        context.delete(object)
+        tasks.remove(at: index)
+        
+        
+        saveTask()
+        getAvailableTask()
+    }
+    
+    private func addTask(task: Task) {
+        tasks.append(task)
+        saveTask()
+        print("addtask")
+    }
+    
+    private func updateTask(task: Task, withIndex index: Int) {
+        tasks[index] = task
+        saveTask()
+    }
+    
+    private func saveTask() {
         do {
             try context.save()
             tableView.reloadData()
@@ -80,38 +101,29 @@ class TasksTableViewController: UITableViewController {
         
     }
     
-    private func updateTask(task: Task) {
-        
-        
-    }
-    
-    private func saveTask() {
-        
-    }
     
     
     
-    
-    private func addTaskToMyTasks(taskStruct : TaskStruct) {
-        myTasks.append(taskStruct)
-        
-        let entity = NSEntityDescription.entity(forEntityName: "Task", in: context)
-        let task = NSManagedObject(entity: entity!, insertInto: context) as! Task
-        
-        task.title = taskStruct.title
-        task.descriptionTask = taskStruct.description
-        task.isDone = taskStruct.isDone
-        task.date = Date()
-        
-        do  {
-            try context.save()
-            print("task added to db")
-        } catch let error as NSError {
-            print(error.localizedDescription)
-        }
-        
-    }
-    
+//    private func addTaskToMyTasks(taskStruct : TaskStruct) {
+//        myTasks.append(taskStruct)
+//
+//        let entity = NSEntityDescription.entity(forEntityName: "Task", in: context)
+//        let task = NSManagedObject(entity: entity!, insertInto: context) as! Task
+//
+//        task.title = taskStruct.title
+//        task.descriptionTask = taskStruct.description
+//        task.isDone = taskStruct.isDone
+//        task.date = Date()
+//
+//        do  {
+//            try context.save()
+//            print("task added to db")
+//        } catch let error as NSError {
+//            print(error.localizedDescription)
+//        }
+//
+//    }
+//
     // MARK: - Table view data source
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -121,7 +133,7 @@ class TasksTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return myTasks.count
+        return tasks.count
     }
     
     
@@ -129,8 +141,8 @@ class TasksTableViewController: UITableViewController {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "taskCell", for: indexPath) as! TaskTableViewCell
         
-        cell.titileTask.text = myTasks[indexPath.row].title
-        cell.isDoneTaskButton.isEnabled = myTasks[indexPath.row].isDone
+        cell.titileTask.text = tasks[indexPath.row].title
+        cell.isDoneTaskButton.isEnabled = tasks[indexPath.row].isDone
         if cell.isDoneTaskButton.isEnabled {
             cell.titileTask.textColor = #colorLiteral(red: 0.7235287119, green: 0.7235287119, blue: 0.7235287119, alpha: 1)
             cell.descriptionTask.textColor = #colorLiteral(red: 0.7235287119, green: 0.7235287119, blue: 0.7235287119, alpha: 1)
@@ -143,11 +155,9 @@ class TasksTableViewController: UITableViewController {
             cell.isDoneTaskButton.alpha = 0
             
         }
-        if let description = myTasks[indexPath.row].description {
-            cell.descriptionTask.text = description
-        } else {
-            cell.descriptionTask.text = ""
-        }
+        let description = tasks[indexPath.row].descriptionTask
+        cell.descriptionTask.text = description
+        
         return cell
     }
     
@@ -161,27 +171,22 @@ class TasksTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            myTasks.remove(at: indexPath.row)
-            //            tableView.reloadData()
-            tableView.deleteRows(at: [indexPath], with: .fade)
+//            myTasks.remove(at: indexPath.row)
+            deleteTask(index: indexPath.row)
+//            tableView.deleteRows(at: [indexPath], with: .fade)
         }
     }
     
     override func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        let movingTask = myTasks.remove(at: sourceIndexPath.row)
-        myTasks.insert(movingTask, at: destinationIndexPath.row)
-        tableView.reloadData()
-        
+        let movingTask = tasks.remove(at: sourceIndexPath.row)
+        tasks.insert(movingTask, at: destinationIndexPath.row)
+        saveTask()
     }
     
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         
         let action = UIContextualAction(style: .destructive, title: "Удалить") { (action, view, boolValue) in
-//            self.myTasks.remove(at: indexPath.row)
-            
-            //            tableView.reloadData()
-//            tableView.deleteRows(at: [indexPath], with: .fade)
-            self.deleteTask()
+            self.deleteTask(index: indexPath.row)
         }
         let trailingSwipe = UISwipeActionsConfiguration(actions: [action])
         
@@ -189,9 +194,9 @@ class TasksTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        let isDoneTask = self.myTasks[indexPath.row].isDone
+        let isDoneTask = self.tasks[indexPath.row].isDone
         let action = UIContextualAction(style: .normal, title: "Done") { (action, view, complition) in
-            self.myTasks[indexPath.row].isDone.toggle()
+            self.tasks[indexPath.row].isDone.toggle()
             //            tableView.reloadData()
             complition(true)
             tableView.reloadData()
@@ -205,10 +210,11 @@ class TasksTableViewController: UITableViewController {
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "showTaskSegue"  {
+        if segue.identifier == "showTaskSegue" {
             let detailTaskVC = segue.destination as! DetailTaskViewController
             guard let indexPath = tableView.indexPathForSelectedRow else { return }
-            let selectedTask = myTasks[indexPath.row]
+            let selectedTask = tasks[indexPath.row]
+            
             detailTaskVC.currentTask = selectedTask
             detailTaskVC.index = indexPath.row
         }
@@ -219,19 +225,20 @@ class TasksTableViewController: UITableViewController {
         if let vc = segue.source as? DetailTaskViewController {
             let titleNewTask = vc.titleTask.text!
             let descriptionNewTask = vc.descriptionTask.text! != "Введите описание" ? vc.descriptionTask.text! : ""
-            
             let isDoneNewTask = vc.isDoneButton.isOn
-            let newTask = TaskStruct(title: titleNewTask, description: descriptionNewTask, isDone: isDoneNewTask)
+            let newTask = Task(context: context)
+            let index = vc.index
+            newTask.title = titleNewTask
+            newTask.descriptionTask = descriptionNewTask
+            newTask.isDone = isDoneNewTask
+            
             
             if vc.title == "Новая задача" {
-                addTaskToMyTasks(taskStruct: newTask)
+                addTask(task: newTask)
             } else {
-                myTasks[vc.index] = newTask
+                guard let index = index else { return}
+                updateTask(task: newTask, withIndex: index)
             }
-            
-            tableView.reloadData()
-            
         }
-        
     }
 }

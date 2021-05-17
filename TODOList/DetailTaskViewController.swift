@@ -13,7 +13,8 @@ class DetailTaskViewController: UIViewController {
         print("deinit dvc")
     }
 
-    var currentTask : TaskStruct = TaskStruct(title: "", description: nil, isDone: false)
+    let context = (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer.viewContext
+    var currentTask = Task()
     var index : Int!
     
     @IBOutlet weak var titleTask: UITextField!
@@ -26,10 +27,10 @@ class DetailTaskViewController: UIViewController {
               
         titleTask.delegate = self
         descriptionTask.delegate = self
-        
         setupStyleBatItemButtons()
-
-        title =  currentTask.title == "" ? "Новая задача" : "Изменить задачу"
+        
+        
+        title = currentTask.title == "" ? "Новая задача" : "Изменить задачу"
         titleTask.text = currentTask.title
         descriptionTask.text = currentTask.description
         isDoneButton.setOn(currentTask.isDone, animated: true)
@@ -37,8 +38,8 @@ class DetailTaskViewController: UIViewController {
         titleTask.addTarget(self, action: #selector(textFieldsChanged), for: .editingChanged)
         saveButton.isEnabled = false
         
-        if currentTask.description != nil && !currentTask.description!.isEmpty  {
-            descriptionTask.text = currentTask.description
+        if currentTask.descriptionTask != nil && !currentTask.description.isEmpty  {
+            descriptionTask.text = currentTask.descriptionTask
         } else {
             descriptionTask.text = "Введите описание"
             descriptionTask.textColor = UIColor.lightGray
@@ -54,7 +55,7 @@ class DetailTaskViewController: UIViewController {
     @IBAction func savePressed(_ sender: Any) {
         print(sender.self)
         currentTask.title = titleTask.text!
-        currentTask.description = descriptionTask.text!
+        currentTask.descriptionTask = descriptionTask.text!
         print(descriptionTask.text!)// null pointer exception
     }
     
