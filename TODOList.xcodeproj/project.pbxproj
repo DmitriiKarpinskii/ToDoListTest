@@ -15,7 +15,6 @@
 		705281FD2642BDCC00EADA30 /* TasksTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 705281FC2642BDCC00EADA30 /* TasksTableViewController.swift */; };
 		705282002642BE6000EADA30 /* TaskTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 705281FF2642BE6000EADA30 /* TaskTableViewCell.swift */; };
 		705282052642BED900EADA30 /* TaskModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 705282042642BED900EADA30 /* TaskModel.swift */; };
-		705282092642C15A00EADA30 /* TasksStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 705282082642C15A00EADA30 /* TasksStorage.swift */; };
 		7052820C2642D40800EADA30 /* DetailTaskViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7052820B2642D40800EADA30 /* DetailTaskViewController.swift */; };
 		70930AD9264EF482007DD10B /* TaskDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 70930AD7264EF482007DD10B /* TaskDataModel.xcdatamodeld */; };
 		70930ADD264EF527007DD10B /* Task+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70930ADB264EF527007DD10B /* Task+CoreDataClass.swift */; };
@@ -33,7 +32,6 @@
 		705281FC2642BDCC00EADA30 /* TasksTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TasksTableViewController.swift; sourceTree = "<group>"; };
 		705281FF2642BE6000EADA30 /* TaskTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskTableViewCell.swift; sourceTree = "<group>"; };
 		705282042642BED900EADA30 /* TaskModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskModel.swift; sourceTree = "<group>"; };
-		705282082642C15A00EADA30 /* TasksStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TasksStorage.swift; sourceTree = "<group>"; };
 		7052820B2642D40800EADA30 /* DetailTaskViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailTaskViewController.swift; sourceTree = "<group>"; };
 		70930AD8264EF482007DD10B /* TaskDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TaskDataModel.xcdatamodel; sourceTree = "<group>"; };
 		70930ADB264EF527007DD10B /* Task+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Task+CoreDataClass.swift"; path = "TODOList/Task+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -78,7 +76,6 @@
 				705281FF2642BE6000EADA30 /* TaskTableViewCell.swift */,
 				7052820B2642D40800EADA30 /* DetailTaskViewController.swift */,
 				705282042642BED900EADA30 /* TaskModel.swift */,
-				705282082642C15A00EADA30 /* TasksStorage.swift */,
 				705281EB2642BCFD00EADA30 /* Main.storyboard */,
 				705281EE2642BD0000EADA30 /* Assets.xcassets */,
 				705281F02642BD0000EADA30 /* LaunchScreen.storyboard */,
@@ -163,7 +160,6 @@
 				705282002642BE6000EADA30 /* TaskTableViewCell.swift in Sources */,
 				7052820C2642D40800EADA30 /* DetailTaskViewController.swift in Sources */,
 				705281E62642BCFD00EADA30 /* AppDelegate.swift in Sources */,
-				705282092642C15A00EADA30 /* TasksStorage.swift in Sources */,
 				705282052642BED900EADA30 /* TaskModel.swift in Sources */,
 				705281FD2642BDCC00EADA30 /* TasksTableViewController.swift in Sources */,
 				70930ADE264EF527007DD10B /* Task+CoreDataProperties.swift in Sources */,
